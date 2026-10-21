@@ -1,0 +1,41 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Spreadsheet.ViewModels"
+        xmlns:text="using:Spreadsheet.ViewModels.Text"
+        xmlns:cmd="using:Spreadsheet.App.Commands"
+        x:Class="Spreadsheet.App.Views.HelpWindow"
+        x:DataType="vm:HelpViewModel"
+        x:CompileBindings="True"
+        Title="{Binding Title}"
+        Width="680"
+        Height="540"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid RowDefinitions="*,Auto" Margin="16">
+        <Border Grid.Row="0"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="1"
+                CornerRadius="4"
+                Padding="12"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <SelectableTextBlock Text="{Binding Text}"
+                                     TextWrapping="Wrap"
+                                     FontFamily="Consolas, Monospace, Courier New"
+                                     FontSize="13"
+                                     LineHeight="20" />
+            </ScrollViewer>
+        </Border>
+
+        <Button Grid.Row="1"
+                Content="{x:Static text:UiText.CloseButton}"
+                Command="{x:Static cmd:AppCommands.CloseWindowCommand}"
+                CommandParameter="{Binding $parent[Window]}"
+                HorizontalAlignment="Right"
+                MinWidth="90"
+                HorizontalContentAlignment="Center"
+                Margin="0,12,0,0"
+                IsCancel="True"
+                IsDefault="True" />
+    </Grid>
+</Window>

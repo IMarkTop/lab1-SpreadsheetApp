@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:drive="using:Spreadsheet.ViewModels.Drive"
+        x:Class="Spreadsheet.App.Views.DriveSaveFileNameWindow"
+        x:DataType="drive:DriveSaveFileNameViewModel"
+        x:CompileBindings="True"
+        Title="{Binding Title}"
+        Width="460"
+        Height="190"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="20,16">
+        <!-- Підказка -->
+        <TextBlock Grid.Row="0"
+                   Text="{Binding Prompt}"
+                   FontWeight="SemiBold"
+                   Margin="0,0,0,8" />
+
+        <!-- Поле введення назви файлу -->
+        <TextBox Grid.Row="1"
+                 Text="{Binding FileName, Mode=TwoWay}"
+                 Margin="0,0,0,6" />
+
+        <!-- Повідомлення про помилку у назві -->
+        <TextBlock Grid.Row="2"
+                   Text="{Binding ErrorMessage}"
+                   Classes="cell-error"
+                   Margin="0,0,0,8"
+                   IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+
+        <!-- Кнопки: Зберегти та Скасувати -->
+        <StackPanel Grid.Row="3"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Bottom"
+                    Spacing="10">
+            <Button Content="{Binding SaveButtonText}"
+                    Command="{Binding SaveCommand}"
+                    IsDefault="True"
+                    MinWidth="100"
+                    HorizontalContentAlignment="Center" />
+            <Button Content="{Binding CancelButtonText}"
+                    Command="{Binding CancelCommand}"
+                    IsCancel="True"
+                    MinWidth="90"
+                    HorizontalContentAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</Window>

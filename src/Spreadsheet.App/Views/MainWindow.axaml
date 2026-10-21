@@ -1,0 +1,180 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Spreadsheet.ViewModels"
+        xmlns:text="using:Spreadsheet.ViewModels.Text"
+        xmlns:cmd="using:Spreadsheet.App.Commands"
+        xmlns:behaviors="using:Spreadsheet.App.Behaviors"
+        x:Class="Spreadsheet.App.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        x:CompileBindings="True"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="{Binding WindowTitle}"
+        Width="980"
+        Height="640"
+        WindowStartupLocation="CenterScreen"
+        behaviors:WindowClosingBehavior.IsEnabled="True">
+
+    <Window.Resources>
+        <!-- Шаблон для відображення клітинки у звичайному режимі -->
+        <DataTemplate x:Key="CellTemplate" x:DataType="vm:CellViewModel">
+            <TextBlock Text="{Binding DisplayText}"
+                       Classes.cell-error="{Binding IsError}"
+                       ToolTip.Tip="{Binding ErrorMessage}"
+                       VerticalAlignment="Center"
+                       Margin="6,2" />
+        </DataTemplate>
+
+        <!-- Шаблон для редагування клітинки (завжди сирий вираз) -->
+        <DataTemplate x:Key="CellEditingTemplate" x:DataType="vm:CellViewModel">
+            <TextBox Text="{Binding RawText, Mode=OneWay}"
+                     VerticalAlignment="Center"
+                     Padding="4,2"
+                     Margin="0" />
+        </DataTemplate>
+    </Window.Resources>
+
+    <Window.KeyBindings>
+        <KeyBinding Gesture="Ctrl+N" Command="{Binding NewCommand}" />
+        <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenCommand}" />
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveCommand}" />
+        <KeyBinding Gesture="Ctrl+Shift+S" Command="{Binding SaveAsCommand}" />
+        <KeyBinding Gesture="F1" Command="{Binding ShowHelpCommand}" />
+    </Window.KeyBindings>
+
+    <DockPanel LastChildFill="True">
+        <!-- 1. Головне меню -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="{x:Static text:UiText.MenuFile}">
+                <MenuItem Header="{x:Static text:UiText.MenuNew}"
+                          Command="{Binding NewCommand}"
+                          InputGesture="Ctrl+N" />
+                <MenuItem Header="{x:Static text:UiText.MenuOpen}"
+                          Command="{Binding OpenCommand}"
+                          InputGesture="Ctrl+O" />
+                <MenuItem Header="{x:Static text:UiText.MenuOpenFromDrive}"
+                          Command="{Binding OpenFromDriveCommand}" />
+                <Separator />
+                <MenuItem Header="{x:Static text:UiText.MenuSave}"
+                          Command="{Binding SaveCommand}"
+                          InputGesture="Ctrl+S" />
+                <MenuItem Header="{x:Static text:UiText.MenuSaveAs}"
+                          Command="{Binding SaveAsCommand}"
+                          InputGesture="Ctrl+Shift+S" />
+                <MenuItem Header="{x:Static text:UiText.MenuSaveToDrive}"
+                          Command="{Binding SaveToDriveCommand}" />
+                <Separator />
+                <MenuItem Header="{x:Static text:UiText.MenuExit}"
+                          Command="{x:Static cmd:AppCommands.CloseWindowCommand}"
+                          CommandParameter="{Binding $parent[Window]}" />
+            </MenuItem>
+
+            <MenuItem Header="{x:Static text:UiText.MenuTable}">
+                <MenuItem Header="{x:Static text:UiText.MenuInsertRowAbove}"
+                          Command="{Binding InsertRowAboveCommand}" />
+                <MenuItem Header="{x:Static text:UiText.MenuInsertRowBelow}"
+                          Command="{Binding InsertRowBelowCommand}" />
+                <MenuItem Header="{x:Static text:UiText.MenuDeleteRow}"
+                          Command="{Binding DeleteRowCommand}" />
+                <Separator />
+                <MenuItem Header="{x:Static text:UiText.MenuInsertColumnLeft}"
+                          Command="{Binding InsertColumnLeftCommand}" />
+                <MenuItem Header="{x:Static text:UiText.MenuInsertColumnRight}"
+                          Command="{Binding InsertColumnRightCommand}" />
+                <MenuItem Header="{x:Static text:UiText.MenuDeleteColumn}"
+                          Command="{Binding DeleteColumnCommand}" />
+            </MenuItem>
+
+            <MenuItem Header="{x:Static text:UiText.MenuHelp}">
+                <MenuItem Header="{x:Static text:UiText.MenuHelpItem}"
+                          Command="{Binding ShowHelpCommand}"
+                          InputGesture="F1" />
+                <MenuItem Header="{x:Static text:UiText.MenuAbout}"
+                          Command="{Binding ShowAboutCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <!-- 2. Панель інструментів (перемикач режимів) -->
+        <Border DockPanel.Dock="Top"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,1,0,1"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                Padding="8,4">
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <TextBlock Text="Режим:"
+                           VerticalAlignment="Center"
+                           FontWeight="SemiBold"
+                           Margin="0,0,4,0" />
+                <RadioButton Content="{x:Static text:UiText.ModeExpression}"
+                             IsChecked="{Binding !IsValueMode}"
+                             ToolTip.Tip="{x:Static text:UiText.ModeToggleToolTip}" />
+                <RadioButton Content="{x:Static text:UiText.ModeValue}"
+                             IsChecked="{Binding IsValueMode}"
+                             ToolTip.Tip="{x:Static text:UiText.ModeToggleToolTip}" />
+            </StackPanel>
+        </Border>
+
+        <!-- 3. Рядок формул та рядок помилки -->
+        <Border DockPanel.Dock="Top"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,0,0,1"
+                Padding="8,6">
+            <StackPanel Spacing="4">
+                <Grid ColumnDefinitions="70,*">
+                    <!-- Поле з адресою поточної клітинки -->
+                    <TextBox Grid.Column="0"
+                             Text="{Binding SelectedAddressText}"
+                             IsReadOnly="True"
+                             Focusable="False"
+                             FontWeight="Bold"
+                             TextAlignment="Center"
+                             ToolTip.Tip="{x:Static text:UiText.AddressBoxToolTip}"
+                             Margin="0,0,8,0" />
+
+                    <!-- Текстове поле рядка формул (Enter — зберегти, Esc — скасувати) -->
+                    <TextBox Grid.Column="1"
+                             Text="{Binding FormulaText}"
+                             PlaceholderText="{x:Static text:UiText.FormulaBarWatermark}">
+                        <TextBox.KeyBindings>
+                            <KeyBinding Gesture="Enter" Command="{Binding CommitFormulaCommand}" />
+                            <KeyBinding Gesture="Escape" Command="{Binding CancelFormulaEditCommand}" />
+                        </TextBox.KeyBindings>
+                    </TextBox>
+                </Grid>
+
+                <!-- Рядок помилки виділеної клітинки -->
+                <TextBlock Text="{Binding FormulaErrorText}"
+                           Classes="cell-error"
+                           Margin="78,2,0,0"
+                           TextWrapping="Wrap"
+                           IsVisible="{Binding FormulaErrorText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+        </Border>
+
+        <!-- 4. Рядок стану -->
+        <Border DockPanel.Dock="Bottom"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                BorderThickness="0,1,0,0"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                Padding="10,4">
+            <TextBlock Text="{Binding StatusMessage}"
+                       FontSize="12"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        </Border>
+
+        <!-- 5. Таблиця DataGrid -->
+        <DataGrid ItemsSource="{Binding Rows}"
+                  HeadersVisibility="All"
+                  GridLinesVisibility="All"
+                  SelectionMode="Single"
+                  AutoGenerateColumns="False"
+                  CanUserSortColumns="False"
+                  CanUserReorderColumns="False"
+                  CanUserResizeColumns="True"
+                  behaviors:DataGridColumnsBehavior.Headers="{Binding ColumnHeaders}"
+                  behaviors:DataGridColumnsBehavior.CellTemplate="{StaticResource CellTemplate}"
+                  behaviors:DataGridColumnsBehavior.CellEditingTemplate="{StaticResource CellEditingTemplate}"
+                  behaviors:DataGridSelectedCellBehavior.SelectedCell="{Binding SelectedCell}"
+                  behaviors:DataGridCellEditBehavior.CommitCommand="{Binding CommitCellEditCommand}">
+        </DataGrid>
+    </DockPanel>
+</Window>

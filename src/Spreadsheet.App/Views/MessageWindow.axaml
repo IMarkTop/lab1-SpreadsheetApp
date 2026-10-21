@@ -1,0 +1,49 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dialogs="using:Spreadsheet.App.Dialogs"
+        x:Class="Spreadsheet.App.Views.MessageWindow"
+        x:DataType="dialogs:MessageDialogViewModel"
+        x:CompileBindings="True"
+        Title="{Binding Title}"
+        Width="440"
+        Height="180"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Grid RowDefinitions="*,Auto" Margin="20">
+        <TextBlock Grid.Row="0"
+                   Text="{Binding Message}"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Center"
+                   FontSize="14" />
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="10">
+            <!-- Кнопки для режиму підтвердження -->
+            <Button Content="{Binding YesText}"
+                    Command="{Binding AcceptCommand}"
+                    IsVisible="{Binding IsConfirm}"
+                    IsDefault="True"
+                    MinWidth="80"
+                    HorizontalContentAlignment="Center" />
+
+            <Button Content="{Binding NoText}"
+                    Command="{Binding RejectCommand}"
+                    IsVisible="{Binding IsConfirm}"
+                    IsCancel="True"
+                    MinWidth="80"
+                    HorizontalContentAlignment="Center" />
+
+            <!-- Кнопка для звичайного повідомлення -->
+            <Button Content="{Binding OkText}"
+                    Command="{Binding AcceptCommand}"
+                    IsVisible="{Binding !IsConfirm}"
+                    IsDefault="True"
+                    IsCancel="True"
+                    MinWidth="80"
+                    HorizontalContentAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</Window>

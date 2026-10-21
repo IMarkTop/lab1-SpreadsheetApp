@@ -1,0 +1,42 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dialogs="using:Spreadsheet.App.Dialogs"
+        x:Class="Spreadsheet.App.Views.SaveChangesWindow"
+        x:DataType="dialogs:SaveChangesDialogViewModel"
+        x:CompileBindings="True"
+        Title="{Binding Title}"
+        Width="500"
+        Height="180"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Grid RowDefinitions="*,Auto" Margin="20">
+        <TextBlock Grid.Row="0"
+                   Text="{Binding Message}"
+                   TextWrapping="Wrap"
+                   VerticalAlignment="Center"
+                   FontSize="14" />
+
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="10">
+            <Button Content="{Binding SaveText}"
+                    Command="{Binding SaveCommand}"
+                    IsDefault="True"
+                    MinWidth="100"
+                    HorizontalContentAlignment="Center" />
+
+            <Button Content="{Binding DiscardText}"
+                    Command="{Binding DiscardCommand}"
+                    MinWidth="110"
+                    HorizontalContentAlignment="Center" />
+
+            <Button Content="{Binding CancelText}"
+                    Command="{Binding CancelCommand}"
+                    IsCancel="True"
+                    MinWidth="90"
+                    HorizontalContentAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</Window>

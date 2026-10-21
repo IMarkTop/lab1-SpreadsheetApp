@@ -1,0 +1,47 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Spreadsheet.ViewModels"
+        xmlns:text="using:Spreadsheet.ViewModels.Text"
+        xmlns:cmd="using:Spreadsheet.App.Commands"
+        x:Class="Spreadsheet.App.Views.AboutWindow"
+        x:DataType="vm:AboutViewModel"
+        x:CompileBindings="True"
+        Title="{Binding Title}"
+        Width="460"
+        Height="320"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="20">
+        <StackPanel Grid.Row="0" Spacing="4">
+            <TextBlock Text="{Binding AppName}"
+                       FontSize="20"
+                       FontWeight="Bold" />
+            <TextBlock Text="{Binding VersionText}"
+                       FontSize="13"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Spacing="10" Margin="0,16,0,0">
+            <TextBlock Text="{Binding Course}"
+                       FontWeight="SemiBold"
+                       FontSize="14" />
+            <TextBlock Text="{Binding Author}"
+                       FontSize="13" />
+            <TextBlock Text="{Binding Description}"
+                       TextWrapping="Wrap"
+                       FontSize="13"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        </StackPanel>
+
+        <Button Grid.Row="2"
+                Content="{x:Static text:UiText.CloseButton}"
+                Command="{x:Static cmd:AppCommands.CloseWindowCommand}"
+                CommandParameter="{Binding $parent[Window]}"
+                HorizontalAlignment="Right"
+                MinWidth="90"
+                HorizontalContentAlignment="Center"
+                IsDefault="True"
+                IsCancel="True" />
+    </Grid>
+</Window>

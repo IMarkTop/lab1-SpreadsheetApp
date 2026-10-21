@@ -1,0 +1,78 @@
+@startuml usecase
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
+title Діаграма прецедентів: електронні таблиці
+
+actor "Користувач" as User
+actor "Google Drive" as Drive <<зовнішня система>>
+
+rectangle "Програма для роботи з електронними таблицями" {
+
+  package "Робота з таблицею" {
+    usecase "Створити нову таблицю" as UC_New
+    usecase "Ввести / редагувати\nвираз у клітинці" as UC_Edit
+    usecase "Додати / видалити рядок" as UC_Rows
+    usecase "Додати / видалити стовпець" as UC_Cols
+    usecase "Перемкнути режим\nВИРАЗ / ЗНАЧЕННЯ" as UC_Mode
+  }
+
+  package "Обробка виразу" {
+    usecase "Виконати синтаксичну перевірку\n(з локалізацією помилок)" as UC_Syntax
+    usecase "Обчислити значення\n(логічний результат)" as UC_Eval
+    usecase "Перерахувати залежні клітинки" as UC_Recalc
+    usecase "Показати повідомлення\nпро помилку" as UC_Err
+  }
+
+  package "Збереження" {
+    usecase "Зберегти таблицю у файл" as UC_Save
+    usecase "Відкрити таблицю з файлу" as UC_Open
+  }
+
+  package "Google Drive" {
+    usecase "Авторизуватися в Google" as UC_Auth
+    usecase "Зберегти таблицю\nна Google Drive" as UC_SaveDrive
+    usecase "Відкрити таблицю\nз Google Drive" as UC_OpenDrive
+  }
+
+  package "Довідка" {
+    usecase "Переглянути довідку" as UC_Help
+    usecase "Переглянути\n«Про програму»" as UC_About
+  }
+}
+
+User --> UC_New
+User --> UC_Edit
+User --> UC_Rows
+User --> UC_Cols
+User --> UC_Mode
+User --> UC_Save
+User --> UC_Open
+User --> UC_SaveDrive
+User --> UC_OpenDrive
+User --> UC_Help
+User --> UC_About
+
+UC_Edit ..> UC_Syntax : <<include>>
+UC_Edit ..> UC_Eval : <<include>>
+UC_Eval ..> UC_Recalc : <<include>>
+UC_Rows ..> UC_Recalc : <<include>>
+UC_Cols ..> UC_Recalc : <<include>>
+UC_Open ..> UC_Recalc : <<include>>
+
+UC_Err ..> UC_Syntax : <<extend>>\n[є синтаксична помилка]
+UC_Err ..> UC_Eval : <<extend>>\n[помилка типу / ділення на 0 /\nциклічне посилання]
+
+UC_SaveDrive ..> UC_Auth : <<include>>
+UC_OpenDrive ..> UC_Auth : <<include>>
+
+UC_Auth --> Drive
+UC_SaveDrive --> Drive
+UC_OpenDrive --> Drive
+
+note right of UC_Eval
+  Операції варіанта 31:
+  + - * /, mod, div, = < >,
+  not, and, or
+end note
+@enduml

@@ -1,0 +1,22 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Spreadsheet.ViewModels"
+             x:Class="Spreadsheet.App.App"
+             RequestedThemeVariant="Default">
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+
+        <!-- Номери рядків у заголовку рядка DataGrid -->
+        <Style Selector="DataGridRow" x:DataType="vm:RowViewModel">
+            <Setter Property="Header" Value="{Binding RowNumber}" />
+        </Style>
+
+        <!-- Червоний колір для тексту помилок у клітинках -->
+        <Style Selector="TextBlock.cell-error">
+            <Setter Property="Foreground" Value="#D32F2F" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+    </Application.Styles>
+</Application>

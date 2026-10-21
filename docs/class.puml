@@ -1,0 +1,216 @@
+@startuml class
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+hide empty members
+title Діаграма класів: електронні таблиці (варіант 31)
+
+package "Spreadsheet.Core" {
+  class Lexer {
+    +Tokenize(text : string) : Token[]
+  }
+
+  class Parser {
+    +Parse(text : string) : ParseResult
+  }
+
+  class ParseResult <<record>> {
+    +Ast : Expr?
+    +Error : ExpressionError?
+    +IsSuccess : bool
+  }
+
+  abstract class Expr {
+    +Position : int
+    +Length : int
+  }
+  class NumberLiteral
+  class BoolLiteral
+  class CellRefExpr
+  class UnaryExpr
+  class BinaryExpr
+
+  class Evaluator {
+    +Evaluate(expr : Expr, cellProvider : ICellValueProvider) : EvalResult
+  }
+
+  interface ICellValueProvider {
+    +GetCell(address : CellAddress) : CellLookup
+  }
+
+  class CellLookup <<record>> {
+    +Kind : CellLookupKind
+    +Value : Value
+    +Error : ExpressionError?
+  }
+
+  class EvalResult <<record>> {
+    +Value : Value
+    +Error : ExpressionError?
+    +IsSuccess : bool
+  }
+
+  class Worksheet {
+    +RowCount : int
+    +ColumnCount : int
+    +Contains(address : CellAddress) : bool
+    +SetCellText(address : CellAddress, text : string?) : CellAddress[]
+    +GetSnapshot(address : CellAddress) : CellSnapshot
+    +AddRow(index : int) : bool
+    +RemoveRow(index : int) : bool
+    +AddColumn(index : int) : bool
+    +RemoveColumn(index : int) : bool
+  }
+
+  class CellSnapshot <<record>> {
+    +RawText : string
+    +IsEmpty : bool
+    +Result : EvalResult
+  }
+
+  class CellAddress <<record struct>> {
+    +Row : int
+    +Column : int
+    +TryParse(text : string, out address : CellAddress) : bool
+  }
+
+  class DependencyGraph <<internal>> {
+    +SetDependencies(cell : CellAddress, dependencies : IEnumerable<CellAddress>)
+    +ClearDependencies(cell : CellAddress)
+    +Plan(seeds : IEnumerable<CellAddress>) : EvaluationPlan
+  }
+}
+
+package "Spreadsheet.Storage" {
+  interface IStorage {
+    +SaveAsync(sheet : Worksheet, location : string, ct : CancellationToken) : Task<string>
+    +LoadAsync(location : string, ct : CancellationToken) : Task<Worksheet>
+  }
+
+  class LocalFileStorage
+  class GoogleDriveStorage
+  class CompositeStorage
+
+  interface IDriveFileSource {
+    +ListFilesAsync(ct : CancellationToken) : Task<IReadOnlyList<DriveFileInfo>>
+  }
+
+  class StorageLocation <<record>> {
+    +Location : string
+    +DisplayName : string
+  }
+
+  class SpreadsheetSerializer <<static>> {
+    +{static} ToJson(sheet : Worksheet) : string
+    +{static} FromJson(json : string) : Worksheet
+  }
+}
+
+package "Spreadsheet.ViewModels" {
+  class MainViewModel {
+    +Rows : IReadOnlyList<RowViewModel>
+    +SelectedCell : CellViewModel?
+    +CurrentLocation : StorageLocation?
+    +CurrentFilePath : string?
+    +DocumentName : string
+    +WindowTitle : string
+    +IsDirty : bool
+    +Mode : DisplayMode
+    +CommitCell(cell : CellViewModel, text : string?)
+    +NewCommand : IAsyncRelayCommand
+    +OpenCommand : IAsyncRelayCommand
+    +OpenFromDriveCommand : IAsyncRelayCommand
+    +SaveCommand : IAsyncRelayCommand
+    +SaveAsCommand : IAsyncRelayCommand
+    +SaveToDriveCommand : IAsyncRelayCommand
+  }
+
+  class RowViewModel {
+    +RowIndex : int
+    +Cells : IReadOnlyList<CellViewModel>
+  }
+
+  class CellViewModel {
+    +Address : CellAddress
+    +RawText : string
+    +DisplayText : string
+    +ErrorMessage : string
+    +IsError : bool
+  }
+
+  interface IDialogService {
+    +ShowErrorAsync(message : string) : Task
+    +ConfirmAsync(message : string) : Task<bool>
+    +PickOpenFileAsync() : Task<string?>
+    +PickSaveFileAsync(suggestedName : string) : Task<string?>
+    +AskSaveChangesAsync(documentName : string) : Task<SaveChangesChoice>
+    +PickDriveFileAsync() : Task<StorageLocation?>
+    +AskDriveFileNameAsync(suggestedName : string) : Task<string?>
+  }
+}
+
+package "Spreadsheet.App" {
+  class MainWindow <<View>>
+  class AvaloniaDialogService
+}
+
+' Зв'язки Core
+Expr <|-- NumberLiteral
+Expr <|-- BoolLiteral
+Expr <|-- CellRefExpr
+Expr <|-- UnaryExpr
+Expr <|-- BinaryExpr
+
+Parser ..> Lexer
+Parser ..> ParseResult
+ParseResult --> Expr
+
+Evaluator ..> Expr
+Evaluator --> ICellValueProvider
+Evaluator ..> EvalResult
+ICellValueProvider ..> CellLookup
+
+Worksheet ..|> ICellValueProvider
+Worksheet --> DependencyGraph
+Worksheet ..> Parser
+Worksheet ..> Evaluator
+Worksheet ..> CellSnapshot
+Worksheet ..> CellAddress
+
+' Зв'язки Storage
+IStorage <|.. LocalFileStorage
+IStorage <|.. GoogleDriveStorage
+IStorage <|.. CompositeStorage
+IDriveFileSource <|.. GoogleDriveStorage
+CompositeStorage o-- "2" IStorage
+IStorage ..> Worksheet
+SpreadsheetSerializer ..> Worksheet
+GoogleDriveStorage ..> SpreadsheetSerializer
+LocalFileStorage ..> SpreadsheetSerializer
+
+' Зв'язки ViewModels
+MainViewModel o-- Worksheet
+MainViewModel o-- IStorage
+MainViewModel o-- IDialogService
+MainViewModel *-- "*" RowViewModel
+RowViewModel *-- "*" CellViewModel
+CellViewModel ..> CellAddress
+MainViewModel --> StorageLocation
+
+' Зв'язки App
+MainWindow --> MainViewModel
+AvaloniaDialogService ..|> IDialogService
+AvaloniaDialogService --> IDriveFileSource
+
+note bottom of Evaluator
+  Evaluator не обчислює інші клітинки
+  рекурсивно: бере вже збережені
+  результати через ICellValueProvider.
+end note
+
+note right of CompositeStorage
+  Маршрутизує запити: за префіксом
+  "gdrive:" на GoogleDriveStorage,
+  інакше на LocalFileStorage.
+end note
+
+@enduml

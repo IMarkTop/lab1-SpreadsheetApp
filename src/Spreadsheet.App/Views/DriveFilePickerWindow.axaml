@@ -1,0 +1,91 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:drive="using:Spreadsheet.ViewModels.Drive"
+        x:Class="Spreadsheet.App.Views.DriveFilePickerWindow"
+        x:DataType="drive:DriveFilePickerViewModel"
+        x:CompileBindings="True"
+        Title="{Binding Title}"
+        Width="520"
+        Height="420"
+        WindowStartupLocation="CenterOwner">
+
+    <Grid RowDefinitions="*,Auto" Margin="16">
+        <!-- Вміст: завантаження, помилка, порожньо або список файлів -->
+        <Panel Grid.Row="0">
+            <!-- Індикатор завантаження -->
+            <StackPanel VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Spacing="12"
+                        IsVisible="{Binding IsLoading}">
+                <ProgressBar IsIndeterminate="True" Width="200" Height="4" />
+                <TextBlock Text="{Binding LoadingText}"
+                           HorizontalAlignment="Center"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            </StackPanel>
+
+            <!-- Помилка завантаження списку з кнопкою повтору -->
+            <StackPanel VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Spacing="12"
+                        IsVisible="{Binding HasError}">
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Classes="cell-error"
+                           TextWrapping="Wrap"
+                           MaxWidth="420"
+                           TextAlignment="Center" />
+                <Button Content="{Binding RetryButtonText}"
+                        Command="{Binding RetryCommand}"
+                        HorizontalAlignment="Center"
+                        MinWidth="120"
+                        HorizontalContentAlignment="Center" />
+            </StackPanel>
+
+            <!-- Повідомлення про відсутність файлів -->
+            <TextBlock Text="{Binding EmptyText}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       IsVisible="{Binding IsEmpty}" />
+
+            <!-- Список файлів на Google Drive -->
+            <ListBox ItemsSource="{Binding Files}"
+                     SelectedItem="{Binding SelectedFile}"
+                     IsVisible="{Binding !IsLoading}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="drive:DriveFileItemViewModel">
+                        <Grid ColumnDefinitions="*,Auto" Margin="4,2">
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding Name}"
+                                       FontWeight="Medium"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding ModifiedTimeText}"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                       FontSize="12"
+                                       VerticalAlignment="Center"
+                                       Margin="12,0,0,0" />
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Panel>
+
+        <!-- Нижня панель дій: Відкрити та Скасувати -->
+        <StackPanel Grid.Row="1"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Spacing="10"
+                    Margin="0,16,0,0">
+            <Button Content="{Binding OpenButtonText}"
+                    Command="{Binding OpenCommand}"
+                    IsDefault="True"
+                    MinWidth="100"
+                    HorizontalContentAlignment="Center" />
+            <Button Content="{Binding CancelButtonText}"
+                    Command="{Binding CancelCommand}"
+                    IsCancel="True"
+                    MinWidth="100"
+                    HorizontalContentAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,54 @@
+@startuml sequences
+autonumber
+skinparam shadowing false
+title Діаграма послідовностей: введення виразу в клітинку\nприклад: B2 = "A1 > 5 and not (C1 = 3)"
+
+actor "Користувач" as User
+participant "MainWindow\n(View)" as View
+participant "MainViewModel" as VM
+participant "CellViewModel" as CellVM
+participant "Worksheet" as Sheet
+participant "Parser" as Parser
+participant "DependencyGraph" as Graph
+participant "Evaluator" as Eval
+
+activate User
+User -> View ++ : вводить текст у клітинку B2\nі натискає Enter
+View -> VM ++ : CommitCell(B2, text)
+VM -> Sheet ++ : SetCellText(B2, text)
+
+== Етап 1: синтаксична перевірка ==
+Sheet -> Parser ++ : Parse(text)
+Parser --> Sheet -- : ParseResult
+
+alt Синтаксична помилка (IsSuccess = false)
+  Sheet -> Sheet : зберегти ExpressionError\n(повідомлення + позиція),\nClearDependencies(B2);\nзалежні клітинки перераховуються\nтак само (ReferencedCellError)
+else Вираз коректний
+  == Етап 2: залежності та порядок обчислення ==
+  Sheet -> Sheet : DependencyCollector.Collect(ast)\n→ {A1, C1}
+  Sheet -> Graph ++ : SetDependencies(B2, {A1, C1})
+  Graph --> Sheet -- : готово
+  Sheet -> Graph ++ : Plan({B2})\n(B2 + залежні клітинки)
+  Graph --> Sheet -- : EvaluationPlan\n(Order: топологічний порядок,\nCyclic: клітинки на циклах)
+
+  == Етап 3: обчислення ==
+  loop для кожної клітинки плану
+    alt Клітинка лежить на циклі
+      Sheet -> Sheet : зберегти ExpressionError\n(CircularReference)
+    else Клітинка поза циклом
+      Sheet -> Eval ++ : Evaluate(ast)
+      Eval -> Sheet : GetCell(A1), GetCell(C1)\n(вже збережені результати)
+      Sheet --> Eval : CellLookup
+      Eval --> Sheet -- : EvalResult\n(значення або помилка:\nтип, ділення, посилання)
+    end
+  end
+end
+
+Sheet --> VM -- : перераховані клітинки\n(у порядку обчислення)
+
+VM -> CellVM ++ : оновити DisplayText / ErrorMessage\nзалежно від режиму ВИРАЗ / ЗНАЧЕННЯ
+CellVM --> VM -- : PropertyChanged
+VM --> View -- : оновлення прив'язок
+View --> User -- : таблиця оновлена
+deactivate User
+@enduml
