@@ -6,7 +6,7 @@ title Діаграма класів: електронні таблиці (вар
 
 package "Spreadsheet.Core" {
   class Lexer {
-    +Tokenize(text : string) : Token[]
+    +Tokenize(text : string) : LexResult
   }
 
   class Parser {
@@ -30,7 +30,8 @@ package "Spreadsheet.Core" {
   class BinaryExpr
 
   class Evaluator {
-    +Evaluate(expr : Expr, cellProvider : ICellValueProvider) : EvalResult
+    +Evaluator(cells : ICellValueProvider)
+    +Evaluate(expr : Expr) : EvalResult
   }
 
   interface ICellValueProvider {

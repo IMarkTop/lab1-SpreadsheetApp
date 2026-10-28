@@ -34,6 +34,18 @@ public static class UiText
     public const string ModeExpression = "ВИРАЗ";
     public const string ModeValue = "ЗНАЧЕННЯ";
     public const string ModeToggleToolTip = "Перемкнути режим відображення: ВИРАЗ / ЗНАЧЕННЯ";
+    public const string ToolbarRowAbove = "+ Рядок ↑";
+    public const string ToolbarRowBelow = "+ Рядок ↓";
+    public const string ToolbarDeleteRow = "− Рядок";
+    public const string ToolbarColumnLeft = "+ Стовпець ←";
+    public const string ToolbarColumnRight = "+ Стовпець →";
+    public const string ToolbarDeleteColumn = "− Стовпець";
+    public const string ToolbarRowAboveToolTip = "Вставити рядок вище виділеної клітинки";
+    public const string ToolbarRowBelowToolTip = "Вставити рядок нижче виділеної клітинки (або в кінець таблиці)";
+    public const string ToolbarDeleteRowToolTip = "Видалити виділений рядок";
+    public const string ToolbarColumnLeftToolTip = "Вставити стовпець ліворуч від виділеної клітинки";
+    public const string ToolbarColumnRightToolTip = "Вставити стовпець праворуч від виділеної клітинки (або в кінець таблиці)";
+    public const string ToolbarDeleteColumnToolTip = "Видалити виділений стовпець";
     public const string FormulaBarWatermark = "Введіть число, true/false або вираз";
     public const string AddressBoxToolTip = "Адреса виділеної клітинки";
 

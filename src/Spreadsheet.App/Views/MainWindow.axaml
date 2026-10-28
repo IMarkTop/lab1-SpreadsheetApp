@@ -93,24 +93,71 @@
             </MenuItem>
         </Menu>
 
-        <!-- 2. Панель інструментів (перемикач режимів) -->
+        <!-- 2. Панель інструментів (режим, рядки, стовпці) -->
         <Border DockPanel.Dock="Top"
                 BorderBrush="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
                 BorderThickness="0,1,0,1"
                 Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
                 Padding="8,4">
-            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                <TextBlock Text="Режим:"
-                           VerticalAlignment="Center"
-                           FontWeight="SemiBold"
-                           Margin="0,0,4,0" />
-                <RadioButton Content="{x:Static text:UiText.ModeExpression}"
-                             IsChecked="{Binding !IsValueMode}"
-                             ToolTip.Tip="{x:Static text:UiText.ModeToggleToolTip}" />
-                <RadioButton Content="{x:Static text:UiText.ModeValue}"
-                             IsChecked="{Binding IsValueMode}"
-                             ToolTip.Tip="{x:Static text:UiText.ModeToggleToolTip}" />
-            </StackPanel>
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <!-- Перемикач режимів -->
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="0,0,10,0">
+                    <TextBlock Text="Режим:"
+                               VerticalAlignment="Center"
+                               FontWeight="SemiBold"
+                               Margin="0,0,4,0" />
+                    <RadioButton Content="{x:Static text:UiText.ModeExpression}"
+                                 IsChecked="{Binding !IsValueMode}"
+                                 ToolTip.Tip="{x:Static text:UiText.ModeToggleToolTip}" />
+                    <RadioButton Content="{x:Static text:UiText.ModeValue}"
+                                 IsChecked="{Binding IsValueMode}"
+                                 ToolTip.Tip="{x:Static text:UiText.ModeToggleToolTip}" />
+                </StackPanel>
+
+                <!-- Розділювач -->
+                <Border Width="1" Height="18"
+                        Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        VerticalAlignment="Center"
+                        Margin="0,0,10,0" />
+
+                <!-- Дії з рядками -->
+                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center" Margin="0,0,10,0">
+                    <Button Content="{x:Static text:UiText.ToolbarRowAbove}"
+                            Command="{Binding InsertRowAboveCommand}"
+                            ToolTip.Tip="{x:Static text:UiText.ToolbarRowAboveToolTip}"
+                            Padding="8,4" />
+                    <Button Content="{x:Static text:UiText.ToolbarRowBelow}"
+                            Command="{Binding InsertRowBelowCommand}"
+                            ToolTip.Tip="{x:Static text:UiText.ToolbarRowBelowToolTip}"
+                            Padding="8,4" />
+                    <Button Content="{x:Static text:UiText.ToolbarDeleteRow}"
+                            Command="{Binding DeleteRowCommand}"
+                            ToolTip.Tip="{x:Static text:UiText.ToolbarDeleteRowToolTip}"
+                            Padding="8,4" />
+                </StackPanel>
+
+                <!-- Розділювач -->
+                <Border Width="1" Height="18"
+                        Background="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        VerticalAlignment="Center"
+                        Margin="0,0,10,0" />
+
+                <!-- Дії зі стовпцями -->
+                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                    <Button Content="{x:Static text:UiText.ToolbarColumnLeft}"
+                            Command="{Binding InsertColumnLeftCommand}"
+                            ToolTip.Tip="{x:Static text:UiText.ToolbarColumnLeftToolTip}"
+                            Padding="8,4" />
+                    <Button Content="{x:Static text:UiText.ToolbarColumnRight}"
+                            Command="{Binding InsertColumnRightCommand}"
+                            ToolTip.Tip="{x:Static text:UiText.ToolbarColumnRightToolTip}"
+                            Padding="8,4" />
+                    <Button Content="{x:Static text:UiText.ToolbarDeleteColumn}"
+                            Command="{Binding DeleteColumnCommand}"
+                            ToolTip.Tip="{x:Static text:UiText.ToolbarDeleteColumnToolTip}"
+                            Padding="8,4" />
+                </StackPanel>
+            </WrapPanel>
         </Border>
 
         <!-- 3. Рядок формул та рядок помилки -->
