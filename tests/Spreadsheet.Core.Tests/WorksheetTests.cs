@@ -7,7 +7,7 @@ using Xunit;
 namespace Spreadsheet.Core.Tests;
 
 /// <summary>
-/// Юніт-тести функціональності ядра електронної таблиці (Варіант 31).
+/// Юніт-тести функціональності ядра електронної таблиці.
 /// </summary>
 public class WorksheetTests
 {
@@ -28,10 +28,10 @@ public class WorksheetTests
     }
 
     /// <summary>
-    /// Тест 1: Обчислення логічного виразу операціями Варіанта 31 (+, -, *, /, mod, div, =, &lt;, &gt;, not, and, or).
+    /// Тест 1: Обчислення логічного виразу операціями (+, -, *, /, mod, div, =, &lt;, &gt;, not, and, or).
     /// </summary>
     [Fact]
-    public void Evaluate_Expression_WithVariant31Operations_ReturnsCorrectBooleanResult()
+    public void Evaluate_Expression_ReturnsCorrectBooleanResult()
     {
         var sheet = new Worksheet(5, 5);
 
@@ -75,7 +75,7 @@ public class WorksheetTests
     }
 
     /// <summary>
-    /// Тест 3: Локалізація синтаксичної помилки (перший етап обробки з визначенням позиції).
+    /// Тест 3: Локалізація синтаксичної помилки.
     /// </summary>
     [Fact]
     public void SyntaxError_IdentifiesErrorAndLocalizesPosition()
@@ -94,7 +94,7 @@ public class WorksheetTests
     }
 
     /// <summary>
-    /// Тест 4: Виявлення циклічного посилання (Circular Reference).
+    /// Тест 4: Виявлення циклічного посилання.
     /// </summary>
     [Fact]
     public void CircularReference_DetectsCycleAndMarksCellsWithError()
@@ -115,7 +115,7 @@ public class WorksheetTests
     }
 
     /// <summary>
-    /// Тест 5: Семантична помилка часу виконання (ділення на нуль div / mod).
+    /// Тест 5: Семантична помилка часу виконання (ділення на нуль).
     /// </summary>
     [Fact]
     public void EvaluationError_DivisionByZero_ReturnsAppropriateError()

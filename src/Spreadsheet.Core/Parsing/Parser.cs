@@ -6,7 +6,7 @@ using Spreadsheet.Core.Model;
 
 namespace Spreadsheet.Core.Parsing;
 
-/// <summary>Рекурсивний низхідний синтаксичний аналізатор за граматикою з <c>docs/DECISIONS.md</c>.</summary>
+/// <summary>Рекурсивний низхідний синтаксичний аналізатор.</summary>
 public sealed class Parser
 {
     private const int MaxDepth = 256;

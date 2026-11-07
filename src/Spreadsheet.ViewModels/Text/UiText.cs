@@ -1,6 +1,6 @@
 namespace Spreadsheet.ViewModels.Text;
 
-/// <summary>Усі тексти інтерфейсу українською (у XAML доступні через <c>x:Static</c>).</summary>
+/// <summary>Усі тексти інтерфейсу.</summary>
 public static class UiText
 {
     // Вікно та меню
