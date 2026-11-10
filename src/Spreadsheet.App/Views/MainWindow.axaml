@@ -19,7 +19,7 @@
         <DataTemplate x:Key="CellTemplate" x:DataType="vm:CellViewModel">
             <TextBlock Text="{Binding DisplayText}"
                        Classes.cell-error="{Binding IsError}"
-                       ToolTip.Tip="{Binding ErrorMessage}"
+                       ToolTip.Tip="{Binding ToolTipText}"
                        VerticalAlignment="Center"
                        Margin="6,2" />
         </DataTemplate>

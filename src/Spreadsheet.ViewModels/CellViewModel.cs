@@ -16,6 +16,7 @@ public sealed class CellViewModel : ObservableObject
     private bool _isEmpty = true;
     private bool _isError;
     private string _errorMessage = string.Empty;
+    private string? _toolTipText;
 
     /// <summary>Створює подання клітинки за знімком і режимом.</summary>
     public CellViewModel(CellAddress address, CellSnapshot snapshot, DisplayMode mode)
@@ -65,6 +66,13 @@ public sealed class CellViewModel : ObservableObject
         private set => SetProperty(ref _errorMessage, value);
     }
 
+    /// <summary>Текст підказки при наведенні (значення або повідомлення про помилку).</summary>
+    public string? ToolTipText
+    {
+        get => _toolTipText;
+        private set => SetProperty(ref _toolTipText, value);
+    }
+
     internal void Update(CellSnapshot snapshot, DisplayMode mode)
     {
         _snapshot = snapshot;
@@ -88,6 +96,30 @@ public sealed class CellViewModel : ObservableObject
         IsError = error;
         ErrorMessage = error ? ErrorTextFormatter.Format(result!.Error!, _snapshot.RawText) : string.Empty;
         DisplayText = FormatDisplay(_snapshot, _mode);
+        ToolTipText = FormatToolTip(_snapshot, error, ErrorMessage);
+    }
+
+    private static string? FormatToolTip(CellSnapshot snapshot, bool isError, string errorMessage)
+    {
+        if (snapshot.IsEmpty)
+        {
+            return null;
+        }
+
+        if (isError)
+        {
+            return errorMessage;
+        }
+
+        if (snapshot.Result is { IsSuccess: true } res)
+        {
+            Value val = res.Value;
+            return val.Kind == ValueKind.Number
+                ? val.Number.ToString(CultureInfo.InvariantCulture)
+                : val.Boolean ? UiText.TrueText : UiText.FalseText;
+        }
+
+        return snapshot.RawText;
     }
 
     private static string FormatDisplay(CellSnapshot snapshot, DisplayMode mode)
